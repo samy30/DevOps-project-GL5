@@ -15,3 +15,12 @@ go get -u github.com/gorilla/mux
 go get go.mongodb.org/mongo-driver
 
 run project with "go /app/main.go"
+
+
+*** running the project: 
+
+docker-compose up
+
+
+*** after doing changes in the app code:
+docker-compose build && docker-compose up

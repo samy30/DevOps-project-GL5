@@ -23,7 +23,7 @@ func ConnectDB(collectionName string) *mongo.Collection {
 	}
 
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://172.17.0.2:27017/devopsProjectDB").SetAuth(credential)
+	clientOptions := options.Client().ApplyURI("mongodb://database:27017/devopsProjectDB").SetAuth(credential)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)

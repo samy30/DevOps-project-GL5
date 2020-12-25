@@ -1,8 +1,8 @@
 package main
 
 import (
-	helper "DevOps-project-GL5/app/helpers"
-	"DevOps-project-GL5/app/models"
+	helper "devopsProjectModule.com/gl5/helpers"
+	"devopsProjectModule.com/gl5/models"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -247,4 +247,8 @@ func main() {
 	// set our port address
 	log.Fatal(http.ListenAndServe(":8000", r))
 
+}
+
+func Hello() string {
+    return "Hello, world."
 }
