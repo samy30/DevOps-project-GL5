@@ -13,6 +13,8 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	
+    "github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 //Connection mongoDB with helper class
@@ -20,6 +22,7 @@ import (
 var collection = helper.ConnectDB("products")
 var transactionsCollection = helper.ConnectDB("transactions")
 
+// ******************************************************************************************
 // ******************************************************************************************
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
@@ -231,19 +234,18 @@ func buyProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-
 	//Init Router
 	r := mux.NewRouter()
-
+	r.Handle("/metrics", promhttp.Handler())
 	// arrange our route
 	r.HandleFunc("/api/products", getProducts).Methods("GET")
 	r.HandleFunc("/api/products/{id}", getProduct).Methods("GET")
 	r.HandleFunc("/api/products", createProduct).Methods("POST")
 	r.HandleFunc("/api/products/{id}", updateProduct).Methods("PUT")
 	r.HandleFunc("/api/products/{id}", deleteProduct).Methods("DELETE")
-
-	r.HandleFunc("/api/products/{id}/buy", buyProduct).Methods("POST")
-
+    r.HandleFunc("/api/products/{id}/buy",buyProduct).Methods("POST")
+	
+	
 	// set our port address
 	log.Fatal(http.ListenAndServe(":8000", r))
 
