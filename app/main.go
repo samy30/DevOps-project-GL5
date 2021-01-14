@@ -14,7 +14,8 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	
-    "github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 //Connection mongoDB with helper class
@@ -23,6 +24,12 @@ var collection = helper.ConnectDB("products")
 var transactionsCollection = helper.ConnectDB("transactions")
 
 // ******************************************************************************************
+var jobsInQueue = prometheus.NewGauge(
+    prometheus.GaugeOpts{
+        Name: "jobs_in_queue",
+        Help: "Current number of jobs in the queue",
+    },
+)
 // ******************************************************************************************
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +75,7 @@ func getProducts(w http.ResponseWriter, r *http.Request) {
 // ******************************************************************************************
 
 func getProduct(w http.ResponseWriter, r *http.Request) {
+	jobsInQueue.Inc()
 	// set header.
 	w.Header().Set("Content-Type", "application/json")
 
@@ -236,8 +244,9 @@ func buyProduct(w http.ResponseWriter, r *http.Request) {
 func main() {
 	//Init Router
 	r := mux.NewRouter()
-	r.Handle("/metrics", promhttp.Handler())
-	// arrange our route
+
+	r.Path("/metrics").Handler(promhttp.Handler())
+	// arrange our routes
 	r.HandleFunc("/api/products", getProducts).Methods("GET")
 	r.HandleFunc("/api/products/{id}", getProduct).Methods("GET")
 	r.HandleFunc("/api/products", createProduct).Methods("POST")
@@ -245,9 +254,11 @@ func main() {
 	r.HandleFunc("/api/products/{id}", deleteProduct).Methods("DELETE")
     r.HandleFunc("/api/products/{id}/buy",buyProduct).Methods("POST")
 	
-	
+	prometheus.MustRegister(jobsInQueue)
+
 	// set our port address
 	log.Fatal(http.ListenAndServe(":8000", r))
+
 
 }
 

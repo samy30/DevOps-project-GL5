@@ -5,30 +5,21 @@ services:
         container_name: prometheus
         ports:
             - 9090:9090
-        command:
-            - --config.file=/etc/prometheus/prometheus.yml
+        command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
         volumes:
-            - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-        depends_on:
-            - cadvisor
-    cadvisor:
-        image: gcr.io/google-containers/cadvisor:latest
-        container_name: cadvisor
-        ports:
-         - 8080:8080
-        volumes:
-            - /:/rootfs:ro
-            - /var/run:/var/run:rw
-            - /sys:/sys:ro
-            - /var/lib/docker/:/var/lib/docker:ro
-        depends_on:
+            - ./prometheus:/etc/prometheus
+            - prometheus-data:/prometheus
+        networks:
+            - devops-project-network
+        depends_on: 
             - backend
     backend:
+        container_name: backend
         build:
             context: .
             dockerfile: Dockerfile
         ports:
-            - '8000:8000'
+            - 8000:8000
         restart: unless-stopped
         depends_on: 
             - database
@@ -51,5 +42,6 @@ services:
         restart: unless-stopped
 volumes:
     mongo-volume:
+    prometheus-data:
 networks:
     devops-project-network:
