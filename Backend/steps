@@ -1,0 +1,2 @@
+install go (see docs)
+apt-get install build-essential (to install gcc compiler)

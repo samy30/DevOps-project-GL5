@@ -1,0 +1,19 @@
+version: '3'
+services:
+    devops_project_database:
+        image: 'mongo'
+        container_name: 'devops_project_database'
+        environment:
+            - MONGO_INITDB_DATABASE=devopsProjectDB
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=root
+        volumes:
+            - ./seed-data/initmongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+            - mongo-volume:/data/db
+        ports:
+            - 27017:27017
+        restart: unless-stopped
+volumes:
+    mongo-volume:
+networks:
+    devops-project-network:
