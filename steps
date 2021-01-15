@@ -24,3 +24,8 @@ docker-compose up
 
 *** after doing changes in the app code:
 docker-compose build && docker-compose up
+
+**** Prometheus *****
+localhost:9090
+***** To check Prometheus Health ****
+http://localhost:9090/classic/targets 
