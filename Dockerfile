@@ -6,24 +6,25 @@ RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh
 
 # Add Maintainer Info
-LABEL maintainer="Sami Belaid"
+LABEL maintainer="Sami Belaid & Ons Tliba"
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
-# Copy go mod and sum files
-COPY ./app/ ./
+# Fetch dependencies on separate layer as they are less likely to
+# change on every build and will therefore be cached for speeding
+# up the next build
+COPY ./app/go.mod ./app/go.sum ./
+RUN go mod download
 
-# Download all dependancies. Dependencies will be cached if the go.mod and go.sum files are not changed
-# RUN go mod download
-
-# Copy the source from the current directory to the Working Directory inside the container
-# COPY . .
+# copy source from the host to the working directory inside
+# the container
+COPY ./app .
 
 # Build the Go app
 RUN go build -o main .
 
-# Expose port 8080 to the outside world
+# Expose port 8000 to the outside world
 EXPOSE 8000
 
 # Run the executable
