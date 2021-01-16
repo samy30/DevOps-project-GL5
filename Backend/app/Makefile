@@ -1,5 +1,5 @@
 install:
-	go mod init gl5-project 2> null
+	go mod init gl5-project 2> /dev/null
 build:
 	go build -o gl5-project.exe
 run: build

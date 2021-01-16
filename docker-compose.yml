@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+    database:
+        image: 'mongo'
+        container_name: 'mongo_database'
+        restart: on-failure
+        env_file: 
+            - .env
+        volumes:
+            - ./Database/seed-data/initmongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+            - mongo-volume:/data/db
+        networks:
+            - devops-project-network
+    backend:
+        container_name: backend
+        build:
+            context: ./Backend
+            dockerfile: Dockerfile.dev
+        ports:
+            - 8000:8000
+        restart: on-failure
+        depends_on: 
+            - database
+        env_file: 
+            - .env
+        networks:
+            - devops-project-network
+volumes:
+    mongo-volume:
+        name: mongo-volume
+networks:
+    devops-project-network:
+        name: devops-project-network
