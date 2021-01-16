@@ -23,17 +23,15 @@ services:
         restart: unless-stopped
         depends_on: 
             - database
-        environment:
-            - MONGO_URL=database:27017
+        env_file: 
+            - .env
         networks:
             - devops-project-network
     database:
         image: 'mongo'
         container_name: 'mongo_database'
-        environment:
-            - MONGO_INITDB_DATABASE=devopsProjectDB
-            - MONGO_INITDB_ROOT_USERNAME=root
-            - MONGO_INITDB_ROOT_PASSWORD=root
+        env_file: 
+            - .env
         volumes:
             - ./scripts/initmongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
             - mongo-volume:/data/db
