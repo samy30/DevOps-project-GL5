@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	helper "devopsProjectModule.com/gl5/helpers"
 	"devopsProjectModule.com/gl5/models"
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -13,7 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	
+
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
@@ -25,15 +25,17 @@ var transactionsCollection = helper.ConnectDB("transactions")
 
 // ******************************************************************************************
 var jobsInQueue = prometheus.NewGauge(
-    prometheus.GaugeOpts{
-        Name: "jobs_in_queue",
-        Help: "Current number of jobs in the queue",
-    },
+	prometheus.GaugeOpts{
+		Name: "jobs_in_queue",
+		Help: "Current number of jobs in the queue",
+	},
 )
+
 // ******************************************************************************************
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	fmt.Println("Connected to MongoDB!")
 
 	// we created Book array
 	var products []models.Product
@@ -252,16 +254,15 @@ func main() {
 	r.HandleFunc("/api/products", createProduct).Methods("POST")
 	r.HandleFunc("/api/products/{id}", updateProduct).Methods("PUT")
 	r.HandleFunc("/api/products/{id}", deleteProduct).Methods("DELETE")
-    r.HandleFunc("/api/products/{id}/buy",buyProduct).Methods("POST")
-	
+	r.HandleFunc("/api/products/{id}/buy", buyProduct).Methods("POST")
+
 	prometheus.MustRegister(jobsInQueue)
 
 	// set our port address
 	log.Fatal(http.ListenAndServe(":8000", r))
 
-
 }
 
 func Hello() string {
-    return "Hello, world."
+	return "Hello, world."
 }

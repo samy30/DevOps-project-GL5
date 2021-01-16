@@ -20,6 +20,7 @@ RUN go mod download
 # copy source from the host to the working directory inside
 # the container
 COPY ./app .
+COPY ./scripts .
 
 # Build the Go app
 RUN go build -o main .
