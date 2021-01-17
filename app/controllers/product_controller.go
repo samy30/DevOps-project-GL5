@@ -7,6 +7,7 @@ import (
 
 	helper "devopsProjectModule.com/gl5/helpers"
 	"devopsProjectModule.com/gl5/models"
+	"devopsProjectModule.com/gl5/payload"
 	"devopsProjectModule.com/gl5/repositories"
 	"devopsProjectModule.com/gl5/usecases"
 	"github.com/gorilla/mux"
@@ -19,9 +20,11 @@ type ProductController struct {
 
 func NewProductController() *ProductController {
 	db := helper.ConnectDB("products")
-	repository := repositories.NewProductRepository(db)
+	db_transactions := helper.ConnectDB("transactions")
+	productRepository := repositories.NewProductRepository(db)
+	transactionRepository := repositories.NewTransactionRepository(db_transactions)
 	return &ProductController{
-		productUseCase: usecases.NewProductUseCase(repository),
+		productUseCase: usecases.NewProductUseCase(productRepository, transactionRepository),
 		ctx:            context.TODO(),
 	}
 }
@@ -115,4 +118,22 @@ func (p ProductController) DeleteProduct(w http.ResponseWriter, r *http.Request)
 	}
 
 	json.NewEncoder(w).Encode("Product deleted successfully")
+}
+
+func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var buyRequest payload.BuyRequest
+
+	// we decode our body request params
+	_ = json.NewDecoder(r.Body).Decode(&buyRequest)
+
+	err := p.productUseCase.BuyProduct(p.ctx, buyRequest)
+
+	if err != nil {
+		helper.GetError(err, w, http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode("Transaction finished successfully")
 }

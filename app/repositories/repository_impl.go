@@ -68,7 +68,23 @@ func (r productRepository) Create(ctx context.Context, product models.Product) e
 func (r productRepository) Update(ctx context.Context, product models.Product) error {
 	id, _ := primitive.ObjectIDFromHex(product.ID)
 
-	_, err := r.db.UpdateOne(ctx, bson.M{"_id": id}, product)
+	// prepare update model.
+	fieldsToUpdate := bson.D{
+		primitive.E{
+			Key: "$set",
+			Value: bson.D{
+				primitive.E{Key: "title", Value: product.Title},
+				primitive.E{Key: "price", Value: product.Price},
+				primitive.E{Key: "initial_quantity", Value: product.InitialQuantity},
+				primitive.E{Key: "quantity", Value: product.Quantity},
+				primitive.E{Key: "category", Value: bson.D{
+					primitive.E{Key: "name", Value: product.Category.Name},
+				}},
+			},
+		},
+	}
+
+	_, err := r.db.UpdateOne(ctx, bson.M{"_id": id}, fieldsToUpdate)
 	if err != nil {
 		return err
 	}
