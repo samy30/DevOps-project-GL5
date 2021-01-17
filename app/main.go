@@ -35,7 +35,6 @@ var jobsInQueue = prometheus.NewGauge(
 
 func getProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	fmt.Println("Connected to MongoDB!")
 
 	// we created Book array
 	var products []models.Product
