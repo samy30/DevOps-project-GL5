@@ -137,3 +137,16 @@ func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode("Transaction finished successfully")
 }
+
+func (p ProductController) GetTransactions(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	transactions, err := p.productUseCase.GetTransactions(p.ctx)
+
+	if err != nil {
+		helper.GetError(err, w, http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(transactions)
+}

@@ -14,4 +14,5 @@ type UseCase interface {
 	UpdateProduct(ctx context.Context, product models.Product) error
 	DeleteProduct(ctx context.Context, id string) error
 	BuyProduct(ctx context.Context, BuyRequest payload.BuyRequest) error
+	GetTransactions(ctx context.Context) ([]models.Transaction, error)
 }

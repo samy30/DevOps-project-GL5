@@ -20,6 +20,7 @@ func main() {
 	r.HandleFunc("/api/products/{id}", controller.UpdateProduct).Methods("PUT")
 	r.HandleFunc("/api/products/{id}", controller.DeleteProduct).Methods("DELETE")
 	r.HandleFunc("/api/products/buy", controller.BuyProduct).Methods("POST")
+	r.HandleFunc("/api/transactions", controller.GetTransactions).Methods("GET")
 
 	// set our port address
 	log.Fatal(http.ListenAndServe(":8000", r))

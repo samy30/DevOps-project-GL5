@@ -69,3 +69,7 @@ func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest payload.BuyRe
 
 	return p.transactionRepository.Create(ctx, transaction)
 }
+
+func (p ProductUseCase) GetTransactions(ctx context.Context) ([]models.Transaction, error) {
+	return p.transactionRepository.GetAll(ctx)
+}
