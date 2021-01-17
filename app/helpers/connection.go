@@ -47,12 +47,12 @@ type ErrorResponse struct {
 
 // GetError : This is helper function to prepare error model.
 // If you want to export your function. You must to start upper case function name. Otherwise you won't see your function when you import that on other class.
-func GetError(err error, w http.ResponseWriter) {
+func GetError(err error, w http.ResponseWriter, statusCode int) {
 
-	log.Fatal(err.Error())
+	log.Printf(err.Error())
 	var response = ErrorResponse{
 		ErrorMessage: err.Error(),
-		StatusCode:   http.StatusInternalServerError,
+		StatusCode:   statusCode,
 	}
 
 	message, _ := json.Marshal(response)
