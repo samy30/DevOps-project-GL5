@@ -3,13 +3,17 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"devopsProjectModule.com/gl5/controllers"
 	"github.com/gorilla/mux"
 )
 
 func main() {
-	controller := controllers.NewProductController()
+	controller := controllers.NewProductController(
+		os.Getenv("MONGO_INITDB_DATABASE"),
+		os.Getenv("MONGO_INITDB_ROOT_USERNAME"),
+		os.Getenv("MONGO_INITDB_ROOT_PASSWORD"))
 	//Init Router
 	r := mux.NewRouter()
 

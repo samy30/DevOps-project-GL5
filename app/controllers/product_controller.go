@@ -18,9 +18,9 @@ type ProductController struct {
 	ctx            context.Context
 }
 
-func NewProductController() *ProductController {
-	db := helper.ConnectDB("products")
-	db_transactions := helper.ConnectDB("transactions")
+func NewProductController(databaseName string, username string, password string) *ProductController {
+	db := helper.ConnectDB("products", databaseName, username, password)
+	db_transactions := helper.ConnectDB("transactions", databaseName, username, password)
 	productRepository := repositories.NewProductRepository(db)
 	transactionRepository := repositories.NewTransactionRepository(db_transactions)
 	return &ProductController{
@@ -131,6 +131,10 @@ func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
 	err := p.productUseCase.BuyProduct(p.ctx, buyRequest)
 
 	if err != nil {
+		if err.Error() == "out of stock" {
+			helper.GetError(err, w, http.StatusBadRequest)
+			return
+		}
 		helper.GetError(err, w, http.StatusInternalServerError)
 		return
 	}

@@ -50,16 +50,17 @@ func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest payload.BuyRe
 		return err1
 	}
 
-	product.Quantity = product.Quantity - buyRequest.Quantity
+	newQuantity, err2 := p.calculateNewProductsQuantity(product.Quantity, buyRequest.Quantity)
 
-	if product.Quantity < 0 {
-		return errors.New("out of stock")
-	}
-
-	err2 := p.productRepository.Update(ctx, product)
-
+	product.Quantity = newQuantity
 	if err2 != nil {
 		return err2
+	}
+
+	err3 := p.productRepository.Update(ctx, product)
+
+	if err3 != nil {
+		return err3
 	}
 
 	var transaction models.Transaction
@@ -72,4 +73,12 @@ func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest payload.BuyRe
 
 func (p ProductUseCase) GetTransactions(ctx context.Context) ([]models.Transaction, error) {
 	return p.transactionRepository.GetAll(ctx)
+}
+
+func (p ProductUseCase) calculateNewProductsQuantity(initialQuantity int, boughtQuantity int) (int, error) {
+	newQuantity := initialQuantity - boughtQuantity
+	if newQuantity < 0 {
+		return -1, errors.New("out of stock")
+	}
+	return newQuantity, nil
 }

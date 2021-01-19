@@ -15,15 +15,15 @@ import (
 
 // ConnectDB : This is helper function to connect mongoDB
 // If you want to export your function. You must to start upper case function name. Otherwise you won't see your function when you import that on other class.
-func ConnectDB(collectionName string) *mongo.Collection {
+func ConnectDB(collectionName string, databaseName string, username string, password string) *mongo.Collection {
 
-	credential := options.Credential{
-		Username: "root",
-		Password: "root",
+	credentials := options.Credential{
+		Username: username,
+		Password: password,
 	}
 
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://database:27017/devopsProjectDB").SetAuth(credential)
+	clientOptions := options.Client().ApplyURI("mongodb://database:27017/" + databaseName).SetAuth(credentials)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
