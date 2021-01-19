@@ -1,0 +1,26 @@
+// installing and configuring the db
+
+*first install docker
+
+docker pull mongo
+docker volume create mongodbData
+docker run -d -p 27107:27017 -v mongodbData:/data/db -v $(pwd)/seed-data:/docker-entrypoint-initdb.d -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=root  --name mongodb mongo
+
+
+// installing and configuring the backend
+
+*first install golang
+
+go get -u github.com/gorilla/mux
+go get go.mongodb.org/mongo-driver
+
+run project with "go /app/main.go"
+
+
+*** running the project: 
+
+docker-compose up
+
+
+*** after doing changes in the app code:
+docker-compose build && docker-compose up

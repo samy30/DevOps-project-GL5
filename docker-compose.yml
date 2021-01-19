@@ -1,0 +1,45 @@
+version: '3'
+services:
+    prometheus:
+        image: prom/prometheus:latest
+        container_name: prometheus
+        ports:
+            - 9090:9090
+        command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml
+        volumes:
+            - ./prometheus:/etc/prometheus
+            - prometheus-data:/prometheus
+        networks:
+            - devops-project-network
+        depends_on: 
+            - backend
+    backend:
+        container_name: backend
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 8000:8000
+        restart: unless-stopped
+        depends_on: 
+            - database
+        env_file: 
+            - .env
+        networks:
+            - devops-project-network
+    database:
+        image: 'mongo'
+        container_name: 'mongo_database'
+        env_file: 
+            - .env
+        volumes:
+            - ./scripts/initmongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+            - mongo-volume:/data/db
+        networks:
+            - devops-project-network
+        restart: unless-stopped
+volumes:
+    mongo-volume:
+    prometheus-data:
+networks:
+    devops-project-network:
