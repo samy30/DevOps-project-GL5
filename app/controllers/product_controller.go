@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 
 	helper "devopsProjectModule.com/gl5/helpers"
@@ -19,14 +20,25 @@ type ProductController struct {
 	ctx            context.Context
 }
 
-func NewProductController(databaseName string, username string, password string) *ProductController {
+func NewProductController(
+	databaseName string,
+	username string,
+	password string,
+	warningLogger *log.Logger,
+	infoLogger *log.Logger,
+	errorLogger *log.Logger) *ProductController {
 	db := helper.ConnectDB("products", databaseName, username, password)
 	db_transactions := helper.ConnectDB("transactions", databaseName, username, password)
 	productRepository := repositories.NewProductRepository(db)
 	transactionRepository := repositories.NewTransactionRepository(db_transactions)
 	return &ProductController{
-		productUseCase: usecases.NewProductUseCase(productRepository, transactionRepository),
-		ctx:            context.TODO(),
+		productUseCase: usecases.NewProductUseCase(
+			productRepository,
+			transactionRepository,
+			warningLogger,
+			infoLogger,
+			errorLogger),
+		ctx: context.TODO(),
 	}
 }
 

@@ -27,6 +27,10 @@ services:
             - .env
         networks:
             - devops-project-network
+        volumes:
+            - type: bind
+              source: ./logs/logs.txt
+              target: /logs.txt
     database:
         image: 'mongo'
         container_name: 'mongo_database'
@@ -41,5 +45,6 @@ services:
 volumes:
     mongo-volume:
     prometheus-data:
+    backend-logs-volume:
 networks:
     devops-project-network:

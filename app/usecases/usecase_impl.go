@@ -3,6 +3,7 @@ package usecases
 import (
 	"context"
 	"errors"
+	"log"
 	"time"
 
 	"devopsProjectModule.com/gl5/models"
@@ -13,33 +14,50 @@ import (
 type ProductUseCase struct {
 	productRepository     repositories.Repository
 	transactionRepository repositories.TransactRepository
+	warningLogger         *log.Logger
+	infoLogger            *log.Logger
+	errorLogger           *log.Logger
 }
 
-func NewProductUseCase(productRepository repositories.Repository, transactionRepository repositories.TransactRepository) UseCase {
+func NewProductUseCase(
+	productRepository repositories.Repository,
+	transactionRepository repositories.TransactRepository,
+	warningLogger *log.Logger,
+	infoLogger *log.Logger,
+	errorLogger *log.Logger) UseCase {
+
 	return &ProductUseCase{
 		productRepository:     productRepository,
 		transactionRepository: transactionRepository,
+		warningLogger:         warningLogger,
+		infoLogger:            infoLogger,
+		errorLogger:           errorLogger,
 	}
 }
 
 func (p ProductUseCase) GetProducts(ctx context.Context) ([]models.Product, error) {
+	p.infoLogger.Println("get products request sent")
 	return p.productRepository.GetAll(ctx)
 }
 
 func (p ProductUseCase) GetProductByID(ctx context.Context, id string) (models.Product, error) {
+	p.infoLogger.Printf("get product by id %s request sent\n", id)
 	return p.productRepository.GetByID(ctx, id)
 }
 
 func (p ProductUseCase) CreateProduct(ctx context.Context, product models.Product) error {
-	product.InitialQuantity = product.Quantity
+	product.Quantity = product.InitialQuantity
+	p.infoLogger.Printf("create product %#v request sent\n", product)
 	return p.productRepository.Create(ctx, product)
 }
 
 func (p ProductUseCase) UpdateProduct(ctx context.Context, product models.Product) error {
+	p.infoLogger.Printf("update product %#v request sent\n", product)
 	return p.productRepository.Update(ctx, product)
 }
 
 func (p ProductUseCase) DeleteProduct(ctx context.Context, id string) error {
+	p.infoLogger.Printf("delete product by id %s request sent\n", id)
 	return p.productRepository.Delete(ctx, id)
 }
 

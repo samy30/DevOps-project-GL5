@@ -9,11 +9,21 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var (
+	warningLogger *log.Logger
+	infoLogger    *log.Logger
+	errorLogger   *log.Logger
+)
+
 func main() {
+	initLogger()
 	controller := controllers.NewProductController(
 		os.Getenv("MONGO_INITDB_DATABASE"),
 		os.Getenv("MONGO_INITDB_ROOT_USERNAME"),
-		os.Getenv("MONGO_INITDB_ROOT_PASSWORD"))
+		os.Getenv("MONGO_INITDB_ROOT_PASSWORD"),
+		warningLogger,
+		infoLogger,
+		errorLogger)
 	//Init Router
 	r := mux.NewRouter()
 
@@ -33,4 +43,16 @@ func main() {
 
 func Hello() string {
 	return "Hello, world."
+}
+
+func initLogger() {
+	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	infoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
+	warningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
+	errorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
