@@ -80,7 +80,7 @@ func (p ProductController) GetProduct(w http.ResponseWriter, r *http.Request) {
 func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var product models.Product
+	var product *models.Product
 
 	// we decode our body request params
 	_ = json.NewDecoder(r.Body).Decode(&product)
@@ -114,7 +114,7 @@ func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request)
 func (p ProductController) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var product models.Product
+	var product *models.Product
 
 	var params = mux.Vars(r)
 
@@ -165,7 +165,7 @@ func (p ProductController) DeleteProduct(w http.ResponseWriter, r *http.Request)
 func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var buyRequest payload.BuyRequest
+	var buyRequest *payload.BuyRequest
 
 	// we decode our body request params
 	_ = json.NewDecoder(r.Body).Decode(&buyRequest)

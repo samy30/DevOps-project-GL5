@@ -19,6 +19,7 @@ type ProductUseCase struct {
 	errorLogger           *log.Logger
 }
 
+// Create a new product use case
 func NewProductUseCase(
 	productRepository repositories.Repository,
 	transactionRepository repositories.TransactRepository,
@@ -35,23 +36,23 @@ func NewProductUseCase(
 	}
 }
 
-func (p ProductUseCase) GetProducts(ctx context.Context) ([]models.Product, error) {
+func (p ProductUseCase) GetProducts(ctx context.Context) ([]*models.Product, error) {
 	p.infoLogger.Println("get products request sent")
 	return p.productRepository.GetAll(ctx)
 }
 
-func (p ProductUseCase) GetProductByID(ctx context.Context, id string) (models.Product, error) {
+func (p ProductUseCase) GetProductByID(ctx context.Context, id string) (*models.Product, error) {
 	p.infoLogger.Printf("get product by id %s request sent\n", id)
 	return p.productRepository.GetByID(ctx, id)
 }
 
-func (p ProductUseCase) CreateProduct(ctx context.Context, product models.Product) error {
+func (p ProductUseCase) CreateProduct(ctx context.Context, product *models.Product) error {
 	product.Quantity = product.InitialQuantity
 	p.infoLogger.Printf("create product %#v request sent\n", product)
 	return p.productRepository.Create(ctx, product)
 }
 
-func (p ProductUseCase) UpdateProduct(ctx context.Context, product models.Product) error {
+func (p ProductUseCase) UpdateProduct(ctx context.Context, product *models.Product) error {
 	p.infoLogger.Printf("update product %#v request sent\n", product)
 	return p.productRepository.Update(ctx, product)
 }
@@ -61,7 +62,7 @@ func (p ProductUseCase) DeleteProduct(ctx context.Context, id string) error {
 	return p.productRepository.Delete(ctx, id)
 }
 
-func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest payload.BuyRequest) error {
+func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest *payload.BuyRequest) error {
 	product, err1 := p.productRepository.GetByID(ctx, buyRequest.ProductId)
 
 	if err1 != nil {
@@ -81,15 +82,15 @@ func (p ProductUseCase) BuyProduct(ctx context.Context, buyRequest payload.BuyRe
 		return err3
 	}
 
-	var transaction models.Transaction
+	var transaction *models.Transaction
 	transaction.Date = time.Now().String()
 	transaction.Quantity = buyRequest.Quantity
-	transaction.Product = &product
+	transaction.Product = product
 
 	return p.transactionRepository.Create(ctx, transaction)
 }
 
-func (p ProductUseCase) GetTransactions(ctx context.Context) ([]models.Transaction, error) {
+func (p ProductUseCase) GetTransactions(ctx context.Context) ([]*models.Transaction, error) {
 	return p.transactionRepository.GetAll(ctx)
 }
 
