@@ -21,6 +21,7 @@ steps:
   displayName: "Build"
   inputs:
     command: 'build'
+    arguments: '-o buildOutput.exe'
     workingDirectory: '$(System.DefaultWorkingDirectory)/app'
 - task: Go@0
   displayName: "Test"
@@ -36,8 +37,9 @@ steps:
   displayName: Build and push an image to container registry
   inputs:
     command: buildAndPush
+    buildContext: '$(Build.ArtifactStagingDirectory)'
     repository: 'samy30/go-restapi'
-    dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    dockerfile: '$(Build.ArtifactStagingDirectory)/Dockerfile.prod'
     containerRegistry: 'docker-hub'
     tags: |
       $(tag)
