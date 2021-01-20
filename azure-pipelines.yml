@@ -12,11 +12,11 @@ steps:
   inputs:
     command: 'get'
     arguments: '-d'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/app'
 - task: Go@0
   inputs:
     command: 'build'
-    workingDirectory: '$(System.DefaultWorkingDirectory)'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/app'
 - task: CopyFiles@2
   inputs:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
