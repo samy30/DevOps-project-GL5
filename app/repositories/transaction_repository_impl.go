@@ -21,8 +21,8 @@ func NewTransactionRepository(db *mongo.Collection) TransactRepository {
 }
 
 // Get all the transactions from the database.
-func (r transactionRepository) GetAll(ctx context.Context) ([]models.Transaction, error) {
-	var transactions []models.Transaction
+func (r transactionRepository) GetAll(ctx context.Context) ([]*models.Transaction, error) {
+	var transactions []*models.Transaction
 	cur, err := r.db.Find(ctx, bson.M{})
 
 	defer cur.Close(ctx)
@@ -37,26 +37,26 @@ func (r transactionRepository) GetAll(ctx context.Context) ([]models.Transaction
 		if err != nil {
 			return nil, err
 		}
-		transactions = append(transactions, *transaction)
+		transactions = append(transactions, transaction)
 	}
 	return transactions, err
 }
 
 // Get transaction with the specified ID from the database.
-func (r transactionRepository) GetByID(ctx context.Context, id string) (models.Transaction, error) {
-	var transaction models.Transaction
+func (r transactionRepository) GetByID(ctx context.Context, id string) (*models.Transaction, error) {
+	var transaction *models.Transaction
 	// string to primitive.ObjectID
 	transactionId, _ := primitive.ObjectIDFromHex(id)
 
 	err := r.db.FindOne(ctx, bson.M{"_id": transactionId}).Decode(&transaction)
 	if err != nil {
-		return models.Transaction{}, err
+		return nil, err
 	}
 	return transaction, err
 }
 
 // Create transaction with the specified object
-func (r transactionRepository) Create(ctx context.Context, transaction models.Transaction) error {
+func (r transactionRepository) Create(ctx context.Context, transaction *models.Transaction) error {
 	_, err := r.db.InsertOne(ctx, transaction)
 	if err != nil {
 		return err

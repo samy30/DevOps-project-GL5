@@ -21,8 +21,8 @@ func NewProductRepository(db *mongo.Collection) Repository {
 }
 
 // Get all the products from the database.
-func (r productRepository) GetAll(ctx context.Context) ([]models.Product, error) {
-	var products []models.Product
+func (r productRepository) GetAll(ctx context.Context) ([]*models.Product, error) {
+	var products []*models.Product
 	cur, err := r.db.Find(ctx, bson.M{})
 
 	defer cur.Close(ctx)
@@ -37,26 +37,26 @@ func (r productRepository) GetAll(ctx context.Context) ([]models.Product, error)
 		if err != nil {
 			return nil, err
 		}
-		products = append(products, *product)
+		products = append(products, product)
 	}
 	return products, err
 }
 
 // Get product with the specified ID from the database.
-func (r productRepository) GetByID(ctx context.Context, id string) (models.Product, error) {
-	var product models.Product
+func (r productRepository) GetByID(ctx context.Context, id string) (*models.Product, error) {
+	var product *models.Product
 	// string to primitive.ObjectID
 	productId, _ := primitive.ObjectIDFromHex(id)
 
 	err := r.db.FindOne(ctx, bson.M{"_id": productId}).Decode(&product)
 	if err != nil {
-		return models.Product{}, err
+		return nil, err
 	}
 	return product, err
 }
 
 // Create product with the specified object
-func (r productRepository) Create(ctx context.Context, product models.Product) error {
+func (r productRepository) Create(ctx context.Context, product *models.Product) error {
 	_, err := r.db.InsertOne(ctx, product)
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (r productRepository) Create(ctx context.Context, product models.Product) e
 }
 
 // Update saves the changes to a product in the database.
-func (r productRepository) Update(ctx context.Context, product models.Product) error {
+func (r productRepository) Update(ctx context.Context, product *models.Product) error {
 	id, _ := primitive.ObjectIDFromHex(product.ID)
 
 	// prepare update model.
