@@ -1,5 +1,5 @@
 # final stage
 FROM alpine
 WORKDIR /app
-COPY /app/buildOutput.exe /app/
+COPY /app/buildOutput.exe .
 ENTRYPOINT ./buildOutput.exe
