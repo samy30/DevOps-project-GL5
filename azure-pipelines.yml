@@ -1,0 +1,43 @@
+trigger: 
+ - main
+
+variables:
+  tag: '$(Build.BuildId)'
+
+pool:
+   vmImage: 'ubuntu-latest'
+
+steps: 
+- task: GoTool@0
+  inputs:
+    version: '1.13.5'
+- task: Go@0
+  displayName: "Get dependencies"
+  inputs:
+    command: 'get'
+    arguments: '-d'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/app'
+- task: Go@0
+  displayName: "Build"
+  inputs:
+    command: 'build'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/app'
+- task: Go@0
+  displayName: "Test"
+  inputs:
+    command: 'test'
+    arguments: '-v ./...'
+    workingDirectory: '$(System.DefaultWorkingDirectory)/app'
+- task: CopyFiles@2
+  inputs:
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
+- task: Docker@2
+  displayName: Build and push an image to container registry
+  inputs:
+    command: buildAndPush
+    repository: 'samy30/go-restapi'
+    dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    containerRegistry: 'docker-hub'
+    tags: |
+      $(tag)
