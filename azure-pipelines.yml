@@ -1,5 +1,8 @@
 trigger: 
- - master
+ - main
+
+variables:
+  tag: '$(Build.BuildId)'
 
 pool:
    vmImage: 'ubuntu-latest'
@@ -28,6 +31,13 @@ steps:
 - task: CopyFiles@2
   inputs:
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
-- task: PublishBuildArtifacts@1
+
+- task: Docker@2
+  displayName: Build and push an image to container registry
   inputs:
-     artifactName: drop
+    command: buildAndPush
+    repository: 'go-restapi'
+    dockerfile: '$(Build.SourcesDirectory)/Dockerfile'
+    containerRegistry: 'docker-hub'
+    tags: |
+      $(tag)
