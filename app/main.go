@@ -2,11 +2,14 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"os"
 
+	"github.com/codegangsta/negroni"
+
 	"devopsProjectModule.com/gl5/controllers"
+	"devopsProjectModule.com/gl5/metric"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 var (
@@ -24,10 +27,15 @@ func main() {
 		warningLogger,
 		infoLogger,
 		errorLogger)
-	//Init Router
-	r := mux.NewRouter()
 
-	// arrange our routes
+	n := negroni.New()
+	r := mux.NewRouter()
+	m := metric.NewMiddleware("Product Service")
+
+	n.Use(m)
+	// metrics
+	r.Path("/metrics").Handler(promhttp.Handler())
+	// api
 	r.HandleFunc("/api/products", controller.GetProducts).Methods("GET")
 	r.HandleFunc("/api/products/{id}", controller.GetProduct).Methods("GET")
 	r.HandleFunc("/api/products", controller.CreateProduct).Methods("POST")
@@ -36,8 +44,9 @@ func main() {
 	r.HandleFunc("/api/products/buy", controller.BuyProduct).Methods("POST")
 	r.HandleFunc("/api/transactions", controller.GetTransactions).Methods("GET")
 
-	// set our port address
-	log.Fatal(http.ListenAndServe(":8000", r))
+	n.UseHandler(r)
+
+	n.Run(":8000")
 
 }
 

@@ -44,7 +44,6 @@ func NewProductController(
 
 func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
 	products, err := p.productUseCase.GetProducts(p.ctx)
 
 	if err != nil {
@@ -57,7 +56,7 @@ func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 
 func (p ProductController) GetProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-
+    
 	var params = mux.Vars(r)
 
 	// string to primitive.ObjectID
