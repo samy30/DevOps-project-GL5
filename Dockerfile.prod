@@ -1,0 +1,5 @@
+# final stage
+FROM alpine
+WORKDIR /app
+COPY /app/buildoutput /app/
+ENTRYPOINT ./goapp
