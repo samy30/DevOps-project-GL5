@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-
 	"github.com/codegangsta/negroni"
 
 	"devopsProjectModule.com/gl5/controllers"
@@ -14,10 +12,7 @@ import (
 
 func main() {
 	logger.Info("Server starting...")
-	controller := controllers.NewProductController(
-		os.Getenv("MONGO_INITDB_DATABASE"),
-		os.Getenv("MONGO_INITDB_ROOT_USERNAME"),
-		os.Getenv("MONGO_INITDB_ROOT_PASSWORD"))
+	controller := controllers.NewProductController()
 
 	n := negroni.New()
 	r := mux.NewRouter()

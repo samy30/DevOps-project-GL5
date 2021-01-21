@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -16,16 +17,16 @@ import (
 
 // ConnectDB : This is helper function to connect mongoDB
 // If you want to export your function. You must to start upper case function name. Otherwise you won't see your function when you import that on other class.
-func ConnectDB(databaseName string, username string, password string) *mongo.Client {
+func ConnectDB() *mongo.Client {
 
 	fmt.Println("Connecting to MongoDB...")
 	credentials := options.Credential{
-		Username: username,
-		Password: password,
+		Username: os.Getenv("MONGO_INITDB_ROOT_USERNAME"),
+		Password: os.Getenv("MONGO_INITDB_ROOT_PASSWORD"),
 	}
 
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://database:27017/" + databaseName).SetAuth(credentials)
+	clientOptions := options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_DB_HOST") + ":" + os.Getenv("MONGO_DB_PORT") + "/" + os.Getenv("MONGO_INITDB_DATABASE")).SetAuth(credentials)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)

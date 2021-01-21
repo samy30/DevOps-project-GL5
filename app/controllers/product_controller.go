@@ -21,11 +21,8 @@ type ProductController struct {
 }
 
 // NewProductController : constructs the ProductController struct
-func NewProductController(
-	databaseName string,
-	username string,
-	password string) *ProductController {
-	db := helper.ConnectDB(databaseName, username, password)
+func NewProductController() *ProductController {
+	db := helper.ConnectDB()
 	productsCollection := helper.GetCollection("products", db)
 	transactionsCollection := helper.GetCollection("transactions", db)
 	productRepository := repositories.NewProductRepository(productsCollection)
