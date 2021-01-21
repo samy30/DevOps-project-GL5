@@ -2,6 +2,7 @@ trigger:
  - main
 
 variables:
+  CGO_ENABLED: '0'
   tag: '$(Build.BuildId)'
 
 pool:
@@ -43,3 +44,7 @@ steps:
     containerRegistry: 'docker-hub'
     tags: |
       $(tag)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+     artifactName: drop
