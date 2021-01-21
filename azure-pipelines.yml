@@ -44,3 +44,7 @@ steps:
     containerRegistry: 'docker-hub'
     tags: |
       $(tag)
+
+- task: PublishBuildArtifacts@1
+  inputs:
+     artifactName: drop
