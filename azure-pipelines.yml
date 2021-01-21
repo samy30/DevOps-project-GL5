@@ -2,6 +2,7 @@ trigger:
  - main
 
 variables:
+  CGO_ENABLED: '0'
   tag: '$(Build.BuildId)'
 
 pool:
