@@ -44,9 +44,7 @@ services:
         networks:
             - devops-project-network
         volumes:
-            - type: bind
-              source: ./logs/logs.txt
-              target: /logs.txt
+            - backend-logs-volume:/logs
     database:
         image: 'mongo'
         container_name: 'mongo_database'

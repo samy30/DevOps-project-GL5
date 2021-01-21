@@ -7,6 +7,7 @@ import (
 	"devopsProjectModule.com/gl5/payload"
 )
 
+// UseCase : an interface that holds the methods the handler can consume
 type UseCase interface {
 	GetProducts(ctx context.Context) ([]*models.Product, error)
 	GetProductByID(ctx context.Context, id string) (*models.Product, error)

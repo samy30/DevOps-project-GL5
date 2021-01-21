@@ -1,0 +1,1 @@
+ERROR: 2021/01/21 18:14:55 logger.go:38: Testing the error

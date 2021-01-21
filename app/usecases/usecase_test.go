@@ -3,8 +3,6 @@ package usecases
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"testing"
 
 	"devopsProjectModule.com/gl5/models"
@@ -16,9 +14,8 @@ var productUsecase UseCase
 
 func init() {
 	fmt.Println("initing")
-	logger := log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
 	productUsecase = NewProductUseCase(
-		repositories.NewProductRepositoryTest(), nil, logger, logger, logger)
+		repositories.NewProductRepositoryTest(), nil)
 }
 
 func TestCreateProduct(t *testing.T) {
