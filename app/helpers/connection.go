@@ -26,7 +26,7 @@ func ConnectDB() *mongo.Client {
 	}
 
 	// Set client options
-	clientOptions := options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_DB_HOST") + ":" + os.Getenv("MONGO_DB_PORT") + "/" + os.Getenv("MONGO_INITDB_DATABASE")).SetAuth(credentials)
+	clientOptions := options.Client().ApplyURI("mongodb://" + os.Getenv("MONGO_DB_HOST") + "/" + os.Getenv("MONGO_INITDB_DATABASE")).SetAuth(credentials)
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.TODO(), clientOptions)
