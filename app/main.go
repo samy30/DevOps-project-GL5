@@ -14,7 +14,7 @@ import (
 )
 
 func main() {
-	file, err := os.Open("logs/logs.txt")
+	file, err := os.OpenFile("logs/logs.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatal("file not found")
 	}
