@@ -1,39 +1,58 @@
 package logger
 
 import (
+	"io"
+	"io/ioutil"
 	"log"
-	"os"
 )
 
 var (
-	warningLogger *log.Logger
-	infoLogger    *log.Logger
-	errorLogger   *log.Logger
+	defaultlogger = NewLogger(ioutil.Discard)
 )
 
-func init() {
-	file, err := os.OpenFile("logs/logs.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+type logger struct {
+	logger *log.Logger
+}
 
-	if err != nil {
-		log.Fatalf("error opening file: %v", err)
+// NewLogger :
+func NewLogger(w io.Writer) *logger {
+
+	l := log.New(w, "default", log.Ldate|log.Ltime|log.Lshortfile)
+	return &logger{
+		logger: l,
 	}
-
-	infoLogger = log.New(file, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	warningLogger = log.New(file, "WARNING: ", log.Ldate|log.Ltime|log.Lshortfile)
-	errorLogger = log.New(file, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 // Info ...
+func (l *logger) Info(content string) {
+	l.logger.Println("Info:" + content)
+}
+
+// Default Info ...
 func Info(content string) {
-	infoLogger.Println(content)
+	defaultlogger.Info(content)
 }
 
 // Warn ...
+func (l *logger) Warn(content string) {
+	l.logger.Println("Warn:" + content)
+}
+
+// Default Info ...
 func Warn(content string) {
-	warningLogger.Println(content)
+	defaultlogger.Warn(content)
 }
 
 // Error ...
+func (l *logger) Error(content string) {
+	l.logger.Println("Error:" + content)
+}
+
+// Default Info ...
 func Error(content string) {
-	errorLogger.Println(content)
+	defaultlogger.Error(content)
+}
+
+func SetDefaultLogger(l *logger) {
+	defaultlogger = l
 }

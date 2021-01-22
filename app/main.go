@@ -1,6 +1,9 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/codegangsta/negroni"
 
 	"devopsProjectModule.com/gl5/controllers"
@@ -11,6 +14,12 @@ import (
 )
 
 func main() {
+	file, err := os.Open("logs/logs.txt")
+	if err != nil {
+		log.Fatal("file not found")
+	}
+	log := logger.NewLogger(file)
+	logger.SetDefaultLogger(log)
 	logger.Info("Server starting...")
 	controller := controllers.NewProductController()
 
