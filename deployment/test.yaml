@@ -1,0 +1,161 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image:  samy30/go-restapi:16 # acrforaks2020.azurecr.io/webapp:1.0
+        ports:
+        - containerPort: 8000
+        resources:
+          limits:
+            cpu: "1"
+            memory: "200Mi"
+          requests:
+            cpu: "0.1"
+            memory: "100Mi"
+        env:
+          - name: ConnectionStrings__ProductsContext
+            valueFrom:
+              configMapKeyRef:
+                name: mongo-connection-configmap
+                key: db-connection-string
+        #     secretKeyRef:
+        #       name: mssql-secret
+        #       key: db-connection-string-secret
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+  type: LoadBalancer #ClusterIP #NodePort
+---
+# apiVersion: extensions/v1beta1
+# kind: Ingress
+# metadata:
+#   name: webapp-ingress
+#   namespace: default
+#   annotations:
+#     kubernetes.io/ingress.class: nginx
+#     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+#     nginx.ingress.kubernetes.io/rewrite-target: /$2
+# spec:
+#   rules:
+#   - http:
+#       paths:
+#       - path: /api/hello-world
+#         backend:
+#           serviceName: mvc-service
+#           servicePort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-connection-configmap
+  labels:
+    app: backend
+data:
+  # db-connection-string: Server=tcp:mssql-paas.database.windows.net,1433;Initial Catalog=ProductsDB;Persist Security Info=False;User ID=houssem;Password=@Aa123456;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;
+  db-connection-string: Server=mongo-service;Database=devopsProjectDB;
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongo
+      # image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+      # image: mcr.microsoft.com/mssql/server:2019-CU4-ubuntu-16.04
+        image: mongo
+      # image: microsoft/mssql-server-linux
+        resources:
+          limits:
+            cpu: "2"
+            memory: "3Gi"
+          requests:
+            cpu: "0.5"
+        ports:
+        - containerPort: 27017
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-username
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom: 
+            secretKeyRef:
+              name: mongodb-secret
+              key: mongo-root-password
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /var/opt/mongo
+      volumes:
+      - name: mongo-persistent-storage
+        persistentVolumeClaim:
+          claimName: mongo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+      nodePort: 30000
+  type: NodePort
+---
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: azure-disk
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageaccounttype: Standard_LRS
+  kind: Managed
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mongo-pvc
+  annotations: 
+    volume.beta.kubernetes.io/storage-class: azure-disk
+spec:
+  storageClassName: default
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi

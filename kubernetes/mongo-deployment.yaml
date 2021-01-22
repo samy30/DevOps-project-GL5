@@ -1,0 +1,42 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: productdb
+  name: productdb-service
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  selector:
+    app: productdb
+  clusterIP: None
+    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productdb
+  labels:
+    app: productdb
+spec:
+  selector: 
+    matchLabels:
+      app: productdb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: productdb
+      name: productdb-service
+
+      
+    spec:
+      containers:
+      - image: mongo
+        name: productdb     
+                
+        ports:
+        - containerPort: 27017
+          name: productdb 
