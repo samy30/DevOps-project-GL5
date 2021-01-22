@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
 
 	helper "devopsProjectModule.com/gl5/helpers"
@@ -15,33 +14,28 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// ProductController : a struct that declares the app's logic handler
 type ProductController struct {
 	productUseCase usecases.UseCase
 	ctx            context.Context
 }
 
-func NewProductController(
-	databaseName string,
-	username string,
-	password string,
-	warningLogger *log.Logger,
-	infoLogger *log.Logger,
-	errorLogger *log.Logger) *ProductController {
-	db := helper.ConnectDB("products", databaseName, username, password)
-	db_transactions := helper.ConnectDB("transactions", databaseName, username, password)
-	productRepository := repositories.NewProductRepository(db)
-	transactionRepository := repositories.NewTransactionRepository(db_transactions)
+// NewProductController : constructs the ProductController struct
+func NewProductController() *ProductController {
+	db := helper.ConnectDB()
+	productsCollection := helper.GetCollection("products", db)
+	transactionsCollection := helper.GetCollection("transactions", db)
+	productRepository := repositories.NewProductRepository(productsCollection)
+	transactionRepository := repositories.NewTransactionRepository(transactionsCollection)
 	return &ProductController{
 		productUseCase: usecases.NewProductUseCase(
 			productRepository,
-			transactionRepository,
-			warningLogger,
-			infoLogger,
-			errorLogger),
+			transactionRepository),
 		ctx: context.TODO(),
 	}
 }
 
+// GetProducts : an http handler to list products
 func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	products, err := p.productUseCase.GetProducts(p.ctx)
@@ -54,12 +48,12 @@ func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
+// GetProduct : an http handler to get a product by specified id in request
 func (p ProductController) GetProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-    
+
 	var params = mux.Vars(r)
 
-	// string to primitive.ObjectID
 	id, _ := params["id"]
 
 	product, err := p.productUseCase.GetProductByID(p.ctx, id)
@@ -76,6 +70,7 @@ func (p ProductController) GetProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
+// CreateProduct : http handler to post a new Product
 func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -110,6 +105,7 @@ func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode("Product created successfully")
 }
 
+// UpdateProduct : an http handler to update a given product with the given attributes
 func (p ProductController) UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -138,6 +134,7 @@ func (p ProductController) UpdateProduct(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode("Product updated successfully")
 }
 
+// DeleteProduct : an http handler to delete a product by id
 func (p ProductController) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -161,6 +158,7 @@ func (p ProductController) DeleteProduct(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode("Product deleted successfully")
 }
 
+// BuyProduct : an http handler to the buy product functionality
 func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
@@ -197,6 +195,7 @@ func (p ProductController) BuyProduct(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("Transaction finished successfully")
 }
 
+// GetTransactions : an http handler to list all transactions
 func (p ProductController) GetTransactions(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
