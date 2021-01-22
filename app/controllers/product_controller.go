@@ -46,6 +46,7 @@ func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var productToAdd *models.Product
+	productToAdd = new(models.Product)
 	productToAdd.Title = "productForTest"
 	products = append(products, productToAdd)
 
