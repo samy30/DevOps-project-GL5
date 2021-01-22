@@ -45,6 +45,8 @@ func (p ProductController) GetProducts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	products = append(products, products[0])
+
 	json.NewEncoder(w).Encode(products)
 }
 
