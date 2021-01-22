@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: backend-container
-          image: samy30/go-restapi:24
+          image: samy30/go-restapi:#{Build.BuildId}#
           ports:
             - containerPort: 8000
           env: 
