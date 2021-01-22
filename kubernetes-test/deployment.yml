@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-pod
+  
+  template:
+    metadata:
+      name: backend-pod
+      labels:
+        app: backend-pod
+spec:
+    containers:
+      - name: backend-container
+        image: samy30/go-restapi:22
+        imagePullPolicy: Never
+        ports:
+          - containerPort: 8000
+        env: 
+          - name: MONGO_INITDB_DATABASE
+            value: devopsProjectDB
+          - name: MONGO_INITDB_ROOT_USERNAME
+            value: root
+          - name: MONGO_INITDB_ROOT_PASSWORD
+            value: root
+          - name: MONGO_DB_HOST
+            value: mongo-service

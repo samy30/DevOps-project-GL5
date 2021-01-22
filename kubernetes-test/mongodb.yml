@@ -1,46 +1,41 @@
 apiVersion: apps/v1
-kind: StatefulSet
+
+kind: Deployment
+
 metadata:
-  name: mongo
+  name: mongo-deployment
+  labels:
+    app: mongo-deployment
+
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      role: mongo
-      environment: test
-  serviceName: "mongo"
-  replicas: 3
+      app: mongo-pod
+
   template:
     metadata:
+      name: mongo-pod
       labels:
-        role: mongo
-        environment: test
+        app: mongo-pod
+
     spec:
-      terminationGracePeriodSeconds: 10
       containers:
-      - name: mongo
-        image: mongo
-        command:
-          - mongod
-          - "--replSet"
-          - rs0
-          - "--smallfiles"
-          - "--noprealloc"
-        ports:
-          - containerPort: 27017
-        volumeMounts:
-          - name: mongo-persistent-storage
+        - name: mongodb-container
+          image: mongo
+          volumeMounts: 
+          - name: mongo-volume
             mountPath: /data/db
-      - name: mongo-sidecar
-        image: cvallance/mongo-k8s-sidecar
-        env:
-          - name: MONGO_SIDECAR_POD_LABELS
-            value: "role=mongo,environment=test"
-  volumeClaimTemplates:
-    - metadata:
-        name: mongo-persistent-storage
-      spec:
-        volumeName: "local-volume"
-        accessModes: ["ReadWriteOnce"]
-        resources:
-          requests:
-            storage: 100Mi
+          env: 
+            - name: MONGO_INITDB_DATABASE
+              value: devopsProjectDB
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: root
+          ports:
+            - containerPort: 27017 
+      volumes:
+        - name: mongo-volume
+          persistentVolumeClaim:
+            claimName: local-volume-claim
