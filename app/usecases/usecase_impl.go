@@ -10,6 +10,7 @@ import (
 	"devopsProjectModule.com/gl5/models"
 	"devopsProjectModule.com/gl5/payload"
 	"devopsProjectModule.com/gl5/repositories"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type productUseCase struct {
@@ -41,7 +42,7 @@ func (p productUseCase) GetProductByID(ctx context.Context, id string) (*models.
 }
 
 // CreateProduct : call the repository to persist a product to the database & contains creation logic
-func (p productUseCase) CreateProduct(ctx context.Context, product *models.Product) error {
+func (p productUseCase) CreateProduct(ctx context.Context, product *models.Product) (*primitive.ObjectID, error) {
 	product.Quantity = product.InitialQuantity
 	logger.Info(fmt.Sprintf("create product %#v request sent\n", product))
 	return p.productRepository.Create(ctx, product)

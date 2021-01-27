@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"devopsProjectModule.com/gl5/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 //ProductRepositoryTest in memory repo
@@ -13,7 +14,7 @@ type productRepositoryTest struct {
 	m map[string]*models.Product
 }
 
-//ProductRepositoryTest create new repository
+//NewProductRepositoryTest create new repository
 func NewProductRepositoryTest() Repository {
 	var m = map[string]*models.Product{}
 	return &productRepositoryTest{
@@ -40,10 +41,11 @@ func (r productRepositoryTest) GetByID(ctx context.Context, id string) (*models.
 }
 
 // Create product with the specified object
-func (r productRepositoryTest) Create(ctx context.Context, product *models.Product) error {
+func (r productRepositoryTest) Create(ctx context.Context, product *models.Product) (*primitive.ObjectID, error) {
 	product.ID = strconv.Itoa(len(r.m) + 1)
 	r.m[product.ID] = product
-	return nil
+	id, err := primitive.ObjectIDFromHex(product.ID)
+	return &id, err
 }
 
 // Update saves the changes to a product in the database.
