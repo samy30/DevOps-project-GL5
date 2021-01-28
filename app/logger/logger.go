@@ -17,7 +17,7 @@ type logger struct {
 // NewLogger :
 func NewLogger(w io.Writer) *logger {
 
-	l := log.New(w, "default", log.Ldate|log.Ltime|log.Lshortfile)
+	l := log.New(w, "LOG ", log.Ldate|log.Ltime|log.Lshortfile)
 	return &logger{
 		logger: l,
 	}

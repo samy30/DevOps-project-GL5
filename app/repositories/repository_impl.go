@@ -56,12 +56,14 @@ func (r productRepository) GetByID(ctx context.Context, id string) (*models.Prod
 }
 
 // Create product with the specified object
-func (r productRepository) Create(ctx context.Context, product *models.Product) error {
-	_, err := r.db.InsertOne(ctx, product)
+func (r productRepository) Create(ctx context.Context, product *models.Product) (*primitive.ObjectID, error) {
+	result, err := r.db.InsertOne(ctx, product)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	insertedID, _ := result.InsertedID.(primitive.ObjectID)
+	return &insertedID, nil
+
 }
 
 // Update saves the changes to a product in the database.
