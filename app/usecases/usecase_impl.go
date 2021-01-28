@@ -81,7 +81,7 @@ func (p productUseCase) BuyProduct(ctx context.Context, buyRequest *payload.BuyR
 		return err3
 	}
 
-	var transaction *models.Transaction
+	transaction := new(models.Transaction)
 	transaction.Date = time.Now().String()
 	transaction.Quantity = buyRequest.Quantity
 	transaction.Product = product

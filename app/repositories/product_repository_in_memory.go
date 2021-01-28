@@ -3,11 +3,14 @@ package repositories
 import (
 	"context"
 	"errors"
-	"strconv"
+	"math/rand"
+	"time"
 
 	"devopsProjectModule.com/gl5/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+var letters = []rune("abce1234567890")
 
 //ProductRepositoryTest in memory repo
 type productRepositoryTest struct {
@@ -42,8 +45,11 @@ func (r productRepositoryTest) GetByID(ctx context.Context, id string) (*models.
 
 // Create product with the specified object
 func (r productRepositoryTest) Create(ctx context.Context, product *models.Product) (*primitive.ObjectID, error) {
-	product.ID = strconv.Itoa(len(r.m) + 1)
+	rand.Seed(time.Now().UnixNano())
+	product.ID = randSeq(24)
 	r.m[product.ID] = product
+	// str := "600afed811de73f983c188e5"
+	// hx := hex.EncodeToString([]byte(str))
 	id, err := primitive.ObjectIDFromHex(product.ID)
 	return &id, err
 }
@@ -66,4 +72,12 @@ func (r productRepositoryTest) Delete(ctx context.Context, id string) error {
 	}
 	delete(r.m, id)
 	return nil
+}
+
+func randSeq(n int) string {
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }

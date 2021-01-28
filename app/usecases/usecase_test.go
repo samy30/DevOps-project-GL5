@@ -99,5 +99,36 @@ func TestGetProducts(t *testing.T) {
 }
 
 func TestGetProductByID(t *testing.T) {
+	productUsecase = NewProductUseCase(
+		repositories.NewProductRepositoryTest(), nil)
+	product1 := &models.Product{
+		Title:           "Product 1",
+		Price:           50,
+		InitialQuantity: 45,
+	}
+	product2 := &models.Product{
+		Title:           "Product 2",
+		Price:           20,
+		InitialQuantity: 20,
+	}
+	id1, _ := productUsecase.CreateProduct(context.TODO(), product1)
+	productUsecase.CreateProduct(context.TODO(), product2)
 
+	product, err := productUsecase.GetProductByID(context.TODO(), id1.Hex())
+
+	if err != nil {
+		t.Fail()
+	}
+
+	if product == nil {
+		t.Fail()
+	}
+
+	if product.Title != "Product 1" ||
+		product.ID != id1.Hex() ||
+		product.Price != 50 ||
+		product.InitialQuantity != 45 ||
+		product.Quantity != 45 {
+		t.Fail()
+	}
 }
