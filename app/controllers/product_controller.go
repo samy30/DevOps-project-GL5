@@ -99,7 +99,7 @@ func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	err := p.productUseCase.CreateProduct(p.ctx, product)
+	createdID, err := p.productUseCase.CreateProduct(p.ctx, product)
 
 	if err != nil {
 		helper.GetError(errors.New("Something went wrong Please retry later"), w, http.StatusInternalServerError)
@@ -107,7 +107,9 @@ func (p ProductController) CreateProduct(w http.ResponseWriter, r *http.Request)
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode("Product created successfully")
+	preparedResponse := new(payload.CreateProductResponse)
+	preparedResponse.ProductId = createdID.Hex()
+	json.NewEncoder(w).Encode(preparedResponse)
 }
 
 // UpdateProduct : an http handler to update a given product with the given attributes
